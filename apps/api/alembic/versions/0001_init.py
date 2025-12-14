@@ -52,8 +52,8 @@ def upgrade() -> None:
         sa.Column("password_hash", sa.Text(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
         sa.Column("disabled", sa.Boolean(), nullable=False, server_default=sa.text("false")),
+        sa.UniqueConstraint("username", name="uq_admin_users_username"),
     )
-    op.create_unique_constraint("uq_admin_users_username", "admin_users", ["username"])
 
     # app_settings
     op.create_table(
@@ -62,8 +62,8 @@ def upgrade() -> None:
         sa.Column("key", sa.String(length=128), nullable=False),
         sa.Column("value", sa.Text(), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=True),
+        sa.UniqueConstraint("key", name="uq_app_settings_key"),
     )
-    op.create_unique_constraint("uq_app_settings_key", "app_settings", ["key"])
 
     # promo_codes
     op.create_table(
@@ -75,8 +75,8 @@ def upgrade() -> None:
         sa.Column("status", sa.Enum("ISSUED", "REDEEMED", "EXPIRED", name="promostatus"), nullable=False),
         sa.Column("game_session_id", sa.String(length=36), nullable=False),
         sa.ForeignKeyConstraint(["game_session_id"], ["game_sessions.id"], name="fk_promo_codes_game_session_id_game_sessions"),
+        sa.UniqueConstraint("code", name="uq_promo_codes_code"),
     )
-    op.create_unique_constraint("uq_promo_codes_code", "promo_codes", ["code"])
 
 
 def downgrade() -> None:
@@ -85,10 +85,5 @@ def downgrade() -> None:
     op.drop_table("app_settings")
     op.drop_table("admin_users")
     op.drop_table("game_sessions")
-
-    # Удаляем enum-типы.
-    op.execute("DROP TYPE IF EXISTS promostatus")
-    op.execute("DROP TYPE IF EXISTS botdifficulty")
-    op.execute("DROP TYPE IF EXISTS gamestatus")
 
 
