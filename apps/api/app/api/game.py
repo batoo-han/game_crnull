@@ -97,7 +97,7 @@ def make_move(
     - Именно сервер решает результат.
     - Клиент не может “сообщить о победе” самостоятельно.
     """
-    session: GameSession | None = db.get(GameSession, payload.session_id)
+    session: GameSession | None = db.get(GameSession, str(payload.session_id))
     if session is None:
         raise HTTPException(status_code=404, detail="Игровая сессия не найдена.")
 
@@ -309,14 +309,16 @@ def get_gift_promo(
     )
 
     try:
+        promo = None
         if payload.session_id:
-            session = db.get(GameSession, payload.session_id)
+            session = db.get(GameSession, str(payload.session_id))
             if session is None:
-                raise HTTPException(status_code=404, detail="Игровая сессия не найдена для выдачи промокода.")
-            promo = issue_promo_for_session(db, session)
-        else:
-            # Без session_id нельзя сохранить промокод (game_session_id NOT NULL)
-            raise HTTPException(status_code=400, detail="Не передан session_id для выдачи промокода за подарки.")
+                logger.warning("Сессия для подарков не найдена, fallback на выдачу без привязки")
+            else:
+                promo = issue_promo_for_session(db, session)
+        if promo is None:
+            promo = create_promo_code(db)
+            logger.warning("Выдача промокода за подарки без session_id (fallback)")
 
         promo_code = promo.code
         promo_expires_at = promo.expires_at.isoformat()

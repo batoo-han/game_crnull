@@ -6,10 +6,14 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.core.config import settings
 
 
-engine = create_engine(
-    settings.sqlalchemy_database_url(),
-    pool_pre_ping=True,
-)
+db_url = settings.sqlalchemy_database_url()
+engine_kwargs = {"pool_pre_ping": True}
+
+# Для SQLite добавляем специальные опции и разрешаем файл на диск.
+if db_url.startswith("sqlite:///"):
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
+
+engine = create_engine(db_url, **engine_kwargs)
 
 # ВАЖНО:
 # - autoflush=False: меньше неожиданных flush'ей; flush делаем осознанно.

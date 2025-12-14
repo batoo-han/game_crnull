@@ -1,15 +1,13 @@
 ## Деплой на Ubuntu Server через Docker
 
 ### Что будет запущено
-Через `infra/docker-compose.yml` поднимаются 3 сервиса:
-- `db` (PostgreSQL 16)
-- `api` (FastAPI, перед стартом автоматически делает `alembic upgrade head`)
+Через `infra/docker-compose.yml` поднимаются 2 сервиса:
+- `api` (FastAPI + SQLite файл `data/app.db`, автоприменение миграций не требуется)
 - `web` (Nginx, раздаёт фронтенд и проксирует `/api` на `api:8000`)
 
 ### Порты
 - Web (игра): `8080` на хосте (в контейнере `80`)
 - API (для отладки): `8000` на хосте (в контейнере `8000`)
-- Postgres (опционально): `5432` на хосте
 
 ### Подготовка (локально Windows 11)
 1) Установите Docker Desktop и убедитесь, что он запущен.
@@ -21,11 +19,11 @@ copy .env.example .env
 
 3) Заполните секреты в `.env`:
 - `API_SECRET_KEY`
-- `POSTGRES_PASSWORD`
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
 - `ADMIN_INITIAL_PASSWORD`
 - (Опционально) `ADMIN_ROUTE_SECRET` (если хотите “скрыть” админку за секретным URL)
+ - (Опционально) `DATABASE_URL` если нужен свой путь/драйвер; по умолчанию SQLite `data/app.db`.
 
 4) Соберите и запустите:
 

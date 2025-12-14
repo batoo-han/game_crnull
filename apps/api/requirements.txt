@@ -10,7 +10,6 @@ pydantic-settings==2.8.1
 
 # База данных
 SQLAlchemy==2.0.36
-psycopg[binary]==3.2.3
 alembic==1.14.0
 
 # HTTP (Telegram)

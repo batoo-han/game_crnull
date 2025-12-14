@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>game_crnull — крестики-нолики с подарками и промокодами</h1>
+  <h1>Крестики-нолики с подарками и промокодами</h1>
   <p>Играй, побеждай, собирай подарки — и получай промокоды. Уведомления прилетают в Telegram.</p>
   <!-- Скрин: сохранить свой файл в docs/imgs/screenshot_gifts.png и заменить путь -->
   <img src="docs/imgs/screenshot_gifts.png" alt="Скрин: три подарка собраны" width="720"/>
@@ -18,18 +18,10 @@
 - Соберите 3 подарка (появляются под клетками) — тоже получите промокод.
 - Промокоды живут ограниченное время (настройка в админке).
 
-## Быстрый старт (локально, Windows 11)
-1) Скопировать окружение:
-```bash
-copy .env.example .env
-```
-2) Создать и активировать `.venv` и установить зависимости — см. `docs/development_windows_venv.md`.
-3) Запустить API и фронт (см. тот же гайд).
-
 ## Запуск в Docker (как на сервере)
 См. `docs/deployment_ubuntu_docker.md`:
 - сборка образа API + фронт
-- docker-compose пример
+- docker-compose без внешней БД (по умолчанию SQLite `data/app.db`, вынесена в volume)
 - переменные окружения через `.env`
 
 ## Настройка Telegram
@@ -49,13 +41,8 @@ copy .env.example .env
 - Телеграм: `docs/telegram_setup.md`
 - Дизайн под ЦА: `docs/design_rationale_25_40_female.md`
 
-## Репозиторий и чистота
-- Секреты храним только в `.env` (не коммитить).
-- Мусор/сборки/кэш в `.gitignore`.
-- Перед пушем: прогонить тесты, проверить линты.
-
 ## Стек
-- Backend: FastAPI, SQLAlchemy, PostgreSQL
+- Backend: FastAPI, SQLAlchemy, SQLite (по умолчанию; через `DATABASE_URL` можно указать Postgres/другой драйвер), httpx, slowapi
 - Frontend: React + Vite, TypeScript, framer-motion
 - Тесты: pytest
 

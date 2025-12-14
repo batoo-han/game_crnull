@@ -1,15 +1,4 @@
 services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-tictactoe}
-      POSTGRES_USER: ${POSTGRES_USER:-tictactoe}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME}
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
   api:
     build:
       context: ..
@@ -17,20 +6,12 @@ services:
     env_file:
       - ../.env
     environment:
-      # В Docker соединяемся с сервисом db, а не localhost
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: ${POSTGRES_DB:-tictactoe}
-      POSTGRES_USER: ${POSTGRES_USER:-tictactoe}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME}
-      # В проде лучше выставлять APP_ENV=prod в .env
       APP_ENV: ${APP_ENV:-prod}
-    depends_on:
-      - db
     ports:
       - "8000:8000"
     volumes:
       - api_logs:/app/logs
+      - api_data:/app/data
 
   web:
     build:
@@ -45,7 +26,7 @@ services:
       - "8080:80"
 
 volumes:
-  db_data:
   api_logs:
+  api_data:
 
 

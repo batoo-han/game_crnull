@@ -43,12 +43,10 @@ class Settings(BaseSettings):
     # -----------------------------
     # База данных
     # -----------------------------
-    postgres_host: str = "localhost"
-    postgres_port: int = 5432
-    postgres_db: str = "tictactoe"
-    postgres_user: str = "tictactoe"
-    postgres_password: str = "CHANGE_ME"
+    # По умолчанию — SQLite-файл в репозитории (для простого деплоя и разработки).
+    # Можно переопределить через DATABASE_URL.
     database_url: str | None = None
+    sqlite_path: str = "data/app.db"
 
     # -----------------------------
     # Telegram
@@ -101,17 +99,15 @@ class Settings(BaseSettings):
         Возвращает DSN для SQLAlchemy.
 
         Приоритет:
-        1) DATABASE_URL (если задан)
-        2) POSTGRES_* параметры
+        1) DATABASE_URL (если задан) — можно указать любой драйвер.
+        2) SQLite-файл в `sqlite_path` относительно корня репозитория.
         """
         if self.database_url:
             return self.database_url
 
-        # psycopg3 рекомендован для SQLAlchemy 2.x + PostgreSQL
-        return (
-            f"postgresql+psycopg://{self.postgres_user}:{self.postgres_password}"
-            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
-        )
+        sqlite_file = self._REPO_ROOT / self.sqlite_path
+        sqlite_file.parent.mkdir(parents=True, exist_ok=True)
+        return f"sqlite:///{sqlite_file}"
 
 
 settings = Settings()

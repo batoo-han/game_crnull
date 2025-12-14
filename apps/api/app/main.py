@@ -82,6 +82,8 @@ def create_app() -> FastAPI:
         В продакшене будем использовать Alembic-миграции.
         """
         if settings.app_env == "dev":
+            # Для локальной разработки на SQLite безопасно пересобрать схему.
+            Base.metadata.drop_all(bind=engine)
             Base.metadata.create_all(bind=engine)
 
         # Инициализируем первичного администратора, если он ещё не создан.

@@ -4,8 +4,7 @@ import datetime as dt
 import enum
 import uuid
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, UniqueConstraint, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import JSON, DateTime, Enum, ForeignKey, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -47,7 +46,7 @@ class GameSession(Base):
 
     __tablename__ = "game_sessions"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     created_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[dt.datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -75,7 +74,7 @@ class GameSession(Base):
     # Пример истории:
     # [{"player":"X","cell":0,"ts":"..."} , {"player":"O","cell":4,"ts":"..."}]
     # ВАЖНО: default=list, чтобы у каждого объекта был свой список (не общий).
-    history: Mapped[list[dict]] = mapped_column(JSONB, nullable=False, default=list)
+    history: Mapped[list[dict]] = mapped_column(JSON, nullable=False, default=list)
 
     finished_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
@@ -126,7 +125,7 @@ class PromoCode(Base):
         default=PromoStatus.issued,
     )
 
-    game_session_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("game_sessions.id"), nullable=True)
+    game_session_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("game_sessions.id"), nullable=True)
     game_session: Mapped[GameSession | None] = relationship(back_populates="promo_code")
 
 

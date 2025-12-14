@@ -2,7 +2,7 @@
 
 Этот документ описывает удобный и воспроизводимый сценарий разработки в Cursor на Windows 11:
 - backend запускается из **`.venv`** (Python 3.12+)
-- база данных — PostgreSQL (рекомендуем через Docker только для БД)
+- база данных — SQLite по умолчанию (файл `data/app.db` создаётся автоматически); при желании можно задать `DATABASE_URL` и работать с Postgres
 - frontend — Vite dev server
 
 ---
@@ -10,7 +10,7 @@
 ### 0) Предварительные требования
 - Python **3.12+** установлен и доступен как `py -3.12`
 - Node.js **18+** (у вас стоит 22 — отлично)
-- Docker Desktop (рекомендуется, чтобы поднять Postgres без ручной установки)
+- (Опционально) Docker Desktop — если хотите поднять внешнюю БД (Postgres) или запускать всё в контейнерах
 
 ---
 
@@ -23,28 +23,16 @@ copy .env.example .env
 
 Заполните минимум:
 - `API_SECRET_KEY` (длинный случайный)
-- `POSTGRES_PASSWORD`
 - `ADMIN_INITIAL_PASSWORD`
 - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (если нужен Telegram)
+- (опционально) `DATABASE_URL` — если нужен внешний Postgres/другая БД вместо SQLite
 - (опционально) `ADMIN_ROUTE_SECRET` (если хотите “маскировать” админку)
 
 ---
 
-### 2) Поднять PostgreSQL (вариант А — рекомендованный, через Docker)
-Запускаем **только** БД из docker-compose:
-
-```powershell
-docker compose -f infra/docker-compose.yml up -d db
-```
-
-Проверка:
-- Postgres будет доступен на `localhost:5432`
-- учётка/пароль берутся из `.env` (`POSTGRES_*`)
-
----
-
-### 2) Поднять PostgreSQL (вариант Б — локально без Docker)
-Установите PostgreSQL и создайте БД/пользователя под значения в `.env`.
+### 2) База данных
+- По умолчанию используется SQLite, файл `data/app.db` создаётся автоматически при старте.
+- Если хотите работать с внешним Postgres, задайте `DATABASE_URL` и поднимите БД любым удобным способом (Docker/local).
 
 ---
 
@@ -78,18 +66,7 @@ python -m pip install -r apps\api\requirements.txt -r apps\api\requirements-dev.
 
 ---
 
-### 5) Backend: применить миграции (рекомендуется всегда)
-Миграции создают таблицы и обеспечивают соответствие продакшену.
-
-```powershell
-cd apps\api
-..\..\.venv\Scripts\alembic upgrade head
-cd ..\..
-```
-
----
-
-### 6) Backend: запустить API в dev-режиме
+### 5) Backend: запустить API в dev-режиме
 
 ```powershell
 cd apps\api
@@ -105,7 +82,7 @@ cd apps\api
 
 ---
 
-### 7) Frontend: запустить Vite dev server
+### 6) Frontend: запустить Vite dev server
 В отдельном терминале:
 
 ```powershell
@@ -133,7 +110,7 @@ npm run dev
 
 ---
 
-### 8) Важно про “маскировку” админки
+### 7) Важно про “маскировку” админки
 Если `ADMIN_ROUTE_SECRET` задан:
 - открывайте админку только по `/admin/<секрет>`
 - фронтенд автоматически добавит заголовок `X-Admin-Route-Secret`
@@ -141,7 +118,7 @@ npm run dev
 
 ---
 
-### 9) Типовые команды проверки (по желанию)
+### 8) Типовые команды проверки (по желанию)
 Backend:
 
 ```powershell
