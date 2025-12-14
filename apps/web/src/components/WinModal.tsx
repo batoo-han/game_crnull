@@ -123,12 +123,10 @@ export function WinModal({ isOpen, promoCode, promoExpiresAt, onClose, isGiftWin
                     if (navigator?.clipboard?.writeText) {
                       await navigator.clipboard.writeText(promoCode);
                     } else {
-                      // Fallback для небезопасных контекстов (http): просто показать alert.
-                      alert(`Промокод: ${promoCode}`);
+                      // В небезопасных контекстах (http) может не работать — оставляем без всплывающих окон.
                     }
                   } catch (_e) {
-                    // Если копирование недоступно, хотя бы показать код.
-                    alert(`Промокод: ${promoCode}`);
+                    // Игнорируем, код и так виден в модалке.
                   }
                 }
                 onClose();
