@@ -1,0 +1,27 @@
+# Основные зависимости бекенда.
+# ВАЖНО: версии зафиксированы для повторяемой сборки (Docker/Ubuntu).
+
+fastapi==0.122.0
+starlette>=0.49.1,<0.51
+uvicorn[standard]==0.34.0
+
+# Настройки/ENV
+pydantic-settings==2.8.1
+
+# База данных
+SQLAlchemy==2.0.36
+psycopg[binary]==3.2.3
+alembic==1.14.0
+
+# HTTP (Telegram)
+httpx==0.27.2
+
+# Безопасность
+pyjwt==2.9.0
+pwdlib[argon2]==0.2.1
+slowapi==0.1.9
+
+# Утилиты
+python-json-logger==2.0.7
+
+
