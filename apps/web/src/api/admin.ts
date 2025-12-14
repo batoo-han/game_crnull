@@ -21,7 +21,9 @@ function normalizeBaseUrl(raw: string | undefined): string {
 
 const API_BASE = normalizeBaseUrl(import.meta.env.VITE_API_BASE);
 
-async function adminApi<T>(path: string, init?: RequestInit): Promise<T> {
+type AdminRequestInit = Omit<RequestInit, "body"> & { body?: unknown };
+
+async function adminApi<T>(path: string, init?: AdminRequestInit): Promise<T> {
   // “Скрытая админка”: если открыт URL /admin/<секрет>, то добавляем заголовок.
   // Это не заменяет логин/пароль, а служит дополнительным барьером от перебора URL.
   const m = window.location.pathname.match(/^\/admin\/([^/]+)/);
@@ -174,9 +176,9 @@ async function adminApi<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export async function adminLogin(username: string, password: string): Promise<void> {
-  await adminApi("/api/admin/login", { 
-    method: "POST", 
-    body: { username, password }  // Передаём объект, adminApi сам сериализует
+  await adminApi("/api/admin/login", {
+    method: "POST",
+    body: { username, password } // сериализуется в adminApi
   });
 }
 
