@@ -119,7 +119,17 @@ export function WinModal({ isOpen, promoCode, promoExpiresAt, onClose, isGiftWin
               whileTap={{ scale: 0.95 }}
               onClick={async () => {
                 if (promoCode) {
-                  await navigator.clipboard.writeText(promoCode);
+                  try {
+                    if (navigator?.clipboard?.writeText) {
+                      await navigator.clipboard.writeText(promoCode);
+                    } else {
+                      // Fallback для небезопасных контекстов (http): просто показать alert.
+                      alert(`Промокод: ${promoCode}`);
+                    }
+                  } catch (_e) {
+                    // Если копирование недоступно, хотя бы показать код.
+                    alert(`Промокод: ${promoCode}`);
+                  }
                 }
                 onClose();
               }}
