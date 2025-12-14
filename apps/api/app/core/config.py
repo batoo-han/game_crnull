@@ -18,7 +18,9 @@ class Settings(BaseSettings):
     # Alembic часто запускают из `apps/api/`, и тогда относительный путь ".env"
     # указывает на `apps/api/.env`, а не на корневой `.env`.
     # Поэтому фиксируем путь к `.env` относительно корня репозитория.
-    _REPO_ROOT = Path(__file__).resolve().parents[4]  # .../apps/api/app/core/config.py -> repo root
+    # В контейнере путь выглядит как /app/app/core/config.py.
+    # repo root = /app, поэтому поднимаемся на 2 уровня.
+    _REPO_ROOT = Path(__file__).resolve().parents[2]
     model_config = SettingsConfigDict(
         env_file=str(_REPO_ROOT / ".env"),
         env_file_encoding="utf-8",
