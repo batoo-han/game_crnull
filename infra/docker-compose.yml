@@ -7,8 +7,10 @@ services:
       - ../.env
     environment:
       APP_ENV: ${APP_ENV:-prod}
+    # Порт публикуем только если нужно прямое обращение к API.
+    # Для работы через web-прокси достаточно убрать этот блок.
     ports:
-      - "80:80"
+      - "8000:8000"
     volumes:
       - api_logs:/app/logs
       - api_data:/app/data
@@ -23,7 +25,7 @@ services:
     depends_on:
       - api
     ports:
-      - "8080:80"
+      - "80:80"
 
 volumes:
   api_logs:
